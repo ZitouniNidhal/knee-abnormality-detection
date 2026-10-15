@@ -302,24 +302,7 @@ def _summarise(events: list[_Event]) -> LabelOutput:
 
 
 def extract_report_labels(report: str | None, *, split: str) -> dict[str, LabelOutput]:
-    """Extract conservative pseudo-labels from one **training** report.
-
-    Parameters
-    ----------
-    report:
-        Free-text report from the training set.  ``None`` and blank strings are
-        supported and yield neutral, unmentioned outputs.
-    split:
-        Must be exactly ``"train"`` (case-insensitive surrounding whitespace is
-        accepted).  Passing a test, validation, or unknown split raises
-        ``ValueError`` to make test-report leakage explicit.
-
-    Returns
-    -------
-    dict
-        An insertion-ordered mapping in ``LABELS`` order.  Each value includes
-        ``score``, ``mentioned``, ``confidence``, ``status``, and ``evidence``.
-    """
+    
 
     if not isinstance(split, str) or split.strip().casefold() != "train":
         raise ValueError("report pseudo-labels may only be extracted with split='train'")
@@ -342,6 +325,4 @@ def extract_report_labels(report: str | None, *, split: str) -> dict[str, LabelO
 
 
 def extract_train_report_labels(report: str | None) -> dict[str, LabelOutput]:
-    """Convenience wrapper that makes the training-only constraint explicit."""
-
     return extract_report_labels(report, split="train")
