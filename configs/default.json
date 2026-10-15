@@ -1,0 +1,19 @@
+{
+  "seed": 2026,
+  "num_folds": 5,
+  "image_size": 224,
+  "slices_per_series": 16,
+  "max_series_per_study": 3,
+  "backbone": "vit_small_patch14_dinov2.lvd142m",
+  "embedding_dim": 384,
+  "freeze_backbone": true,
+  "batch_size": 4,
+  "num_workers": 2,
+  "epochs": 12,
+  "head_learning_rate": 0.0003,
+  "backbone_learning_rate": 0.000003,
+  "weight_decay": 0.0001,
+  "gold_label_weight": 8.0,
+  "pseudo_label_weight": 1.0,
+  "use_rank_ensemble": true
+}

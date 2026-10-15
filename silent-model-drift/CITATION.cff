@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use Silent Model Drift in research, please cite this software."
+title: "Silent Model Drift"
+abstract: "Black-box behavioral fingerprinting and permutation tests for detecting unannounced changes in LLM API endpoints."
+type: software
+version: 0.1.0
+date-released: 2026-10-15
+license: MIT
+authors:
+  - name: "Silent Model Drift contributors"
+keywords:
+  - LLM observability
+  - behavioral drift
+  - API monitoring
+  - permutation testing
+

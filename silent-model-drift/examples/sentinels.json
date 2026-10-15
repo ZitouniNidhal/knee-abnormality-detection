@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "name": "core-contract-smoke-suite",
+  "description": "Harmless provider-agnostic sentinels. Replace these with your application contract.",
+  "sentinels": [
+    {
+      "id": "json-format",
+      "tags": ["structured-output", "formatting"],
+      "system": "You are a precise assistant. Follow the requested format exactly.",
+      "prompt": "Return only a JSON object with the keys 'capital' and 'country' for France."
+    },
+    {
+      "id": "constraint-following",
+      "tags": ["instruction-following"],
+      "prompt": "Write exactly three words describing a sunrise. Do not use punctuation."
+    },
+    {
+      "id": "grounded-summarization",
+      "tags": ["grounding", "summarization"],
+      "prompt": "Using only this context: 'The probe was calibrated on Tuesday at 14:00 UTC.' Answer: when was the probe calibrated?"
+    },
+    {
+      "id": "language-routing",
+      "tags": ["multilingual"],
+      "prompt": "Réponds en français, en une phrase: quelle est la couleur du ciel par temps clair ?"
+    }
+  ]
+}
+
