@@ -1,0 +1,13 @@
+image_size: 224
+slices_per_series: 16
+max_series_per_study: 3
+augmentation:
+  train:
+    random_horizontal_flip: true
+    random_rotation_degrees: 15
+    random_brightness_contrast: true
+    normalize_mean: [0.485, 0.456, 0.406]
+    normalize_std: [0.229, 0.224, 0.225]
+  val:
+    normalize_mean: [0.485, 0.456, 0.406]
+    normalize_std: [0.229, 0.224, 0.225]
