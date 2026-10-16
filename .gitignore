@@ -3,7 +3,9 @@ __pycache__/
 .pytest_cache/
 .venv/
 venv/
-data/
+data/*
+!data/README.md
+!data/**/.gitkeep
 artifacts/
 checkpoints/
 features/

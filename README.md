@@ -1,59 +1,61 @@
-# Dataset Guide — RSNA Knee Abnormality Detection
+# RSNA Knee Abnormality Detection
 
-This repository is built for the **RSNA Knee Abnormality Detection** challenge.
+Production-ready Multimodal Deep Learning pipeline for detecting 12 clinically significant knee abnormalities from MRI scans (DICOM series) and radiology reports.
 
-## 1. Official Dataset (Primary)
+---
 
-- **Competition Link:** [RSNA Knee Abnormality Detection on Kaggle](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection)
-- **Data Page:** [https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/data](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/data)
+## 🎯 Target Findings (12 Clinical Multi-Labels)
 
-### Download via Kaggle CLI
-Make sure you have accepted the competition rules on Kaggle, then run:
+The system predicts the presence of 12 conditions evaluated during a comprehensive knee MRI:
 
+| Category | Targets |
+|---|---|
+| **Ligaments** | `ACL` (Anterior Cruciate Ligament), `MCL` (Medial Collateral Ligament) |
+| **Menisci** | `Medial Meniscus`, `Lateral Meniscus` |
+| **Osteoarthritis (OA)** | `Medial OA`, `Lateral OA`, `PF OA` (Patellofemoral) |
+| **Joint Pathology** | `Effusion`, `Synovitis`, `Baker's` (Cyst), `Contusion`, `Fracture` |
+
+---
+
+## 📊 Dataset Links
+
+This repository uses the official challenge dataset:
+
+- **Official Competition:** [RSNA Knee Abnormality Detection on Kaggle](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection)
+- **Data Download Page:** [Kaggle Competition Data](https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/data)
+
+### Download via Kaggle CLI:
 ```bash
-# Download the dataset archive
+# Accept the competition rules on Kaggle first, then:
 kaggle competitions download -c rsna-knee-abnormality-detection
-
-# Unzip into data/raw/
 unzip rsna-knee-abnormality-detection.zip -d data/raw/
 ```
 
-### Expected Folder Structure in `data/raw/`
-```text
-data/raw/
-├── train.csv                # StudyInstanceUID, reports, targets
-├── test.csv                 # Test study identifiers
-├── sample_submission.csv    # Submission template with the 12 targets
-├── train/                   # Training MRI DICOM/image series organized by study
-│   └── <StudyInstanceUID>/
-│       └── <SeriesInstanceUID>/
-│           └── <SOPInstanceUID>.dcm
-└── test/                    # Inference/evaluation MRI series
+### Alternative Benchmark:
+- [Stanford MRNet Dataset](https://stanfordmlgroup.github.io/competitions/mrnet/)
+
+For detailed directory structures, see [`data/README.md`](data/README.md).
+
+---
+
+## 🚀 Quickstart
+
+### 1. Installation
+```bash
+pip install -r requirements.txt
+pip install -e .
 ```
 
----
+### 2. Run Inference Server (FastAPI)
+```bash
+docker-compose up rsna-knee-api
+```
+Or locally:
+```bash
+uvicorn rsna_knee.inference.server:app --host 0.0.0.0 --port 8000
+```
 
-## 2. Alternative / Complementary Benchmarks
-
-- **Stanford MRNet Dataset:**
-  - URL: [https://stanfordmlgroup.github.io/competitions/mrnet/](https://stanfordmlgroup.github.io/competitions/mrnet/)
-  - Focus: Knee MRI exams for ACL tears, meniscal tears, and general abnormalities.
-
----
-
-## 3. Target Findings (12 Clinical Multi-Labels)
-
-The pipeline detects the following 12 conditions (`TARGETS` in `src/rsna_knee/constants.py`):
-
-1. `ACL` (Anterior Cruciate Ligament tear)
-2. `MCL` (Medial Collateral Ligament tear)
-3. `Medial Meniscus` (Medial meniscus tear/degeneration)
-4. `Lateral Meniscus` (Lateral meniscus tear/degeneration)
-5. `Medial OA` (Medial compartment Osteoarthritis)
-6. `Lateral OA` (Lateral compartment Osteoarthritis)
-7. `PF OA` (Patellofemoral Osteoarthritis)
-8. `Effusion` (Joint effusion / excess fluid)
-9. `Synovitis` (Synovial inflammation)
-10. `Baker's` (Baker's / popliteal cyst)
-11. `Contusion` (Bone bruise / contusion)
-12. `Fracture` (Occult / acute bone fracture)
+### 3. API Endpoints
+- `GET /health` — Health check & model status
+- `POST /predict` — Multilabel classification for knee MRI slices
+- `GET /metrics` — Prometheus telemetry
