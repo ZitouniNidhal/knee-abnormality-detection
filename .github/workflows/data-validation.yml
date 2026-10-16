@@ -1,0 +1,40 @@
+name: Data & Schema Validation
+
+on:
+  schedule:
+    # Run every Sunday at midnight UTC
+    - cron: "0 0 * * 0"
+  workflow_dispatch:
+    inputs:
+      csv_path:
+        description: "Path to dataset CSV to validate (if available in runner)"
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - "src/rsna_knee/data/**"
+      - "tests/test_data_validation.py"
+
+jobs:
+  validate-schema:
+    name: Schema & Integrity Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install pytest
+
+      - name: Run Schema & Data Integrity Tests
+        run: |
+          pytest -v tests/test_data_validation.py
