@@ -34,7 +34,11 @@ unzip rsna-knee-abnormality-detection.zip -d data/raw/
 ### Alternative Benchmark:
 - [Stanford MRNet Dataset](https://stanfordmlgroup.github.io/competitions/mrnet/)
 
+<<<<<<< HEAD
 For detailed directory structures, see [`data/README.md`](data/README.md).
+=======
+For detailed directory structures, see [`data/README.md`](file:///data/README.md).
+>>>>>>> 772a78a47a6ff68c9e3bc2dd16dfc7ddd4728a88
 
 ---
 
