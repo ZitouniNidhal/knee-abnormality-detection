@@ -1,0 +1,9 @@
+name: "densenet121"
+timm_name: "densenet121.ra_in1k"
+embedding_dim: 1024
+image_size: 224
+freeze_backbone: false
+dropout: 0.3
+head_hidden_dim: 512
+num_classes: 12
+pretrained: true

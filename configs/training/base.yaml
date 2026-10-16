@@ -1,0 +1,78 @@
+# @package _global_
+# Base training configuration for RSNA Knee Abnormality Detection
+
+defaults:
+  - model: vit_small
+  - data: default
+  - _self_
+
+# ── Reproducibility ──────────────────────────────────────────────────────────
+seed: 2026
+deterministic: true  # torch.use_deterministic_algorithms(True)
+
+# ── Experiment Tracking ───────────────────────────────────────────────────────
+experiment:
+  name: "rsna-knee-baseline"
+  tags:
+    - knee-mri
+    - multilabel
+    - medical-ai
+  notes: "Baseline ViT-S/14 DINOv2 frozen-backbone experiment"
+
+tracking:
+  mlflow:
+    enabled: true
+    tracking_uri: "mlruns"
+    experiment_name: "${experiment.name}"
+  wandb:
+    enabled: false
+    project: "rsna-knee-abnormality"
+    entity: null  # set via WANDB_ENTITY env var
+  tensorboard:
+    enabled: true
+    log_dir: "logs/tensorboard"
+
+# ── Cross-Validation ──────────────────────────────────────────────────────────
+cv:
+  num_folds: 5
+  strategy: "stratified"   # stratified | grouped | kfold
+  fold_seed: ${seed}
+
+# ── Training Loop ─────────────────────────────────────────────────────────────
+training:
+  epochs: 12
+  batch_size: 4
+  num_workers: 2
+  pin_memory: true
+  gradient_clip_val: 1.0
+  accumulate_grad_batches: 1
+  precision: "bf16-mixed"  # 32 | 16-mixed | bf16-mixed
+
+# ── Optimiser ─────────────────────────────────────────────────────────────────
+optimizer:
+  name: "adamw"
+  head_lr: 3.0e-4
+  backbone_lr: 3.0e-6
+  weight_decay: 1.0e-4
+  betas: [0.9, 0.999]
+
+# ── Scheduler ─────────────────────────────────────────────────────────────────
+scheduler:
+  name: "cosine_with_warmup"
+  warmup_epochs: 1
+  min_lr: 1.0e-7
+
+# ── Loss ──────────────────────────────────────────────────────────────────────
+loss:
+  name: "weighted_bce"   # weighted_bce | focal | asymmetric
+  gold_label_weight: 8.0
+  pseudo_label_weight: 1.0
+  focal_gamma: 2.0       # only used when name=focal
+  focal_alpha: 0.25      # only used when name=focal
+
+# ── Paths ──────────────────────────────────────────────────────────────────────
+paths:
+  data_dir: "data"
+  output_dir: "artifacts"
+  results_dir: "results"
+  logs_dir: "logs"

@@ -1,0 +1,10 @@
+# ViT-Small DINOv2 backbone configuration
+name: "vit_small_dinov2"
+timm_name: "vit_small_patch14_dinov2.lvd142m"
+embedding_dim: 384
+image_size: 224
+freeze_backbone: true
+dropout: 0.1
+head_hidden_dim: 256
+num_classes: 12
+pretrained: true

@@ -4,21 +4,89 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rsna-knee"
-version = "0.1.0"
-description = "Reproducible, competition-compliant pipeline for RSNA Knee Abnormality Detection"
+version = "1.0.0"
+description = "Production-grade Medical AI pipeline for RSNA Knee Abnormality Detection"
+readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Nidhal Zitouni" }]
+keywords = ["medical-ai", "knee-mri", "deep-learning", "radiology", "computer-vision"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Healthcare Industry",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Medical Science Apps.",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
 dependencies = [
   "numpy>=1.26",
   "pandas>=2.0",
   "pydicom>=2.4",
+  "pylibjpeg>=2.0",
   "scikit-learn>=1.3",
   "torch>=2.1",
   "timm>=1.0",
   "tqdm>=4.66",
+  "pyyaml>=6.0",
+  "omegaconf>=2.3",
+  "hydra-core>=1.3",
+  "mlflow>=2.10",
+  "wandb>=0.16",
+  "tensorboard>=2.15",
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.27",
+  "python-multipart>=0.0.9",
+  "pillow>=10.0",
+  "opencv-python-headless>=4.8",
+  "matplotlib>=3.7",
+  "seaborn>=0.13",
+  "prometheus-client>=0.20",
+  "opentelemetry-api>=1.22",
+  "opentelemetry-sdk>=1.22",
+  "opentelemetry-instrumentation-fastapi>=0.43b0",
+  "structlog>=24.1",
+  "rich>=13.7",
+  "pydantic>=2.5",
+  "pydantic-settings>=2.2",
+  "httpx>=0.26",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8.0"]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=4.1",
+  "pytest-asyncio>=0.23",
+  "pytest-mock>=3.12",
+  "hypothesis>=6.98",
+  "ruff>=0.3",
+  "black>=24.2",
+  "mypy>=1.8",
+  "bandit>=1.7",
+  "safety>=3.0",
+  "pre-commit>=3.6",
+  "httpx>=0.26",
+]
+xai = [
+  "grad-cam>=1.4",
+  "shap>=0.45",
+  "captum>=0.7",
+]
+data = [
+  "dvc>=3.40",
+  "pyarrow>=14.0",
+  "great-expectations>=0.18",
+  "imagehash>=4.3",
+]
+
+[project.scripts]
+rsna-train = "rsna_knee.training.cli:main"
+rsna-infer = "rsna_knee.inference.cli:main"
+rsna-validate-data = "rsna_knee.data.validate:main"
+rsna-serve = "rsna_knee.inference.server:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -26,4 +94,40 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-addopts = "-q"
+addopts = "-q --cov=src/rsna_knee --cov-report=term-missing --cov-report=xml --cov-fail-under=80"
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "ANN", "S", "B", "A", "C4", "PT", "SIM", "RUF"]
+ignore = ["ANN101", "ANN102", "ANN401", "S101"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "data"]
+skips = ["B101"]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/tests/*", "*/__pycache__/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+]

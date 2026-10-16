@@ -1,0 +1,9 @@
+name: "resnet50"
+timm_name: "resnet50.a1_in1k"
+embedding_dim: 2048
+image_size: 224
+freeze_backbone: false
+dropout: 0.3
+head_hidden_dim: 512
+num_classes: 12
+pretrained: true
