@@ -1,5 +1,3 @@
-"""Capture orchestration that turns endpoint responses into portable artifacts."""
-
 from __future__ import annotations
 
 from time import perf_counter
@@ -18,11 +16,6 @@ def capture_run(
     store_raw_responses: bool = False,
     fail_on_error: bool = False,
 ) -> CaptureRun:
-    """Collect repeated samples while retaining provider errors as observations.
-
-    Prompt order is interleaved by repetition to reduce the chance that a
-    short-lived endpoint condition is assigned to only one sentinel.
-    """
 
     if repeats < 1:
         raise ValueError("repeats must be at least one.")
