@@ -1,0 +1,59 @@
+# GitLab CI/CD Pipeline for RSNA Knee Abnormality Detection MLOps
+
+stages:
+  - lint
+  - test
+  - package
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+# ── Stage 1: Code Quality & Linting ───────────────────────────────────────────
+lint:
+  stage: lint
+  image: python:3.10-slim
+  before_script:
+    - python -m pip install --upgrade pip
+    - pip install ruff black
+  script:
+    - ruff check .
+    - black --check .
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
+
+# ── Stage 2: Tests & Model Evaluation ─────────────────────────────────────────
+test:
+  stage: test
+  image: python:${PYTHON_VERSION}-slim
+  parallel:
+    matrix:
+      - PYTHON_VERSION: ["3.10", "3.11"]
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends libgl1-mesa-glx libglib2.0-0 && rm -rf /var/lib/apt/lists/*
+    - python -m pip install --upgrade pip
+    - pip install -e .
+    - pip install pytest pytest-cov pytest-asyncio
+  script:
+    - pytest -v tests/
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
+
+# ── Stage 3: Docker Packaging Check ───────────────────────────────────────────
+docker-build:
+  stage: package
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker build -t rsna-knee-detection:latest .
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "master"'
