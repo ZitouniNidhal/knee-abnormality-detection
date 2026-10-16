@@ -22,7 +22,7 @@ def seed_everything(seed: int, *, deterministic: bool = True) -> None:
         the cost of some throughput.
     """
     random.seed(seed)
-    np.random.seed(seed)  # noqa: NPY002
+    np.random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
     os.environ["PYTHONHASHSEED"] = str(seed)

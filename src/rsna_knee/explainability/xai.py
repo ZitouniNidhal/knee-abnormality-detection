@@ -19,7 +19,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from ..constants import TARGETS
 from ..utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -44,14 +43,12 @@ class GradCAM:
         self._register_hooks()
 
     def _register_hooks(self) -> None:
-        def forward_hook(
-            module: nn.Module, inp: Any, out: torch.Tensor  # noqa: ANN401
-        ) -> None:
+        def forward_hook(module: nn.Module, inp: Any, out: torch.Tensor) -> None:
             self._activations = out.detach()
 
         def backward_hook(
             module: nn.Module,
-            grad_in: Any,  # noqa: ANN401
+            grad_in: Any,
             grad_out: tuple[torch.Tensor, ...],
         ) -> None:
             self._gradients = grad_out[0].detach()
@@ -102,10 +99,10 @@ class GradCAM:
 
         return cam.astype(np.float32)
 
-    def __enter__(self) -> "GradCAM":
+    def __enter__(self) -> GradCAM:
         return self
 
-    def __exit__(self, *args: Any) -> None:  # noqa: ANN401
+    def __exit__(self, *args: Any) -> None:
         self.remove_hooks()
 
 
@@ -214,15 +211,14 @@ class SHAPExplainer:
         background_samples: torch.Tensor,
     ) -> None:
         try:
-            import shap  # noqa: PLC0415
+            import shap
         except ImportError as exc:
             raise ImportError(
-                "shap is required for SHAPExplainer. "
-                "Install with: pip install shap"
+                "shap is required for SHAPExplainer. Install with: pip install shap"
             ) from exc
 
         self.model = model
-        import shap  # noqa: PLC0415
+        import shap
 
         self._explainer = shap.DeepExplainer(model, background_samples)
 
@@ -258,7 +254,7 @@ def overlay_heatmap(
     -------
     np.ndarray (H, W, 3) uint8
     """
-    import cv2  # noqa: PLC0415
+    import cv2
 
     heatmap_resized = cv2.resize(heatmap, (image.shape[1], image.shape[0]))
     heatmap_uint8 = (heatmap_resized * 255).astype(np.uint8)
@@ -279,7 +275,7 @@ def save_explanation_figure(
 ) -> Path:
     """Save a side-by-side (original | heatmap) explanation figure."""
     try:
-        import matplotlib.pyplot as plt  # noqa: PLC0415
+        import matplotlib.pyplot as plt
     except ImportError:
         logger.warning("matplotlib not installed; skipping figure save")
         return Path(output_dir)
@@ -363,13 +359,15 @@ class ExplainabilityStorage:
         method: str,
         score: float,
     ) -> None:
-        self._index.append({
-            "study_id": study_id,
-            "target": target,
-            "method": method,
-            "score": score,
-            "figure": str(figure_path),
-        })
+        self._index.append(
+            {
+                "study_id": study_id,
+                "target": target,
+                "method": method,
+                "score": score,
+                "figure": str(figure_path),
+            }
+        )
         self._index_path.write_text(json.dumps(self._index, indent=2), encoding="utf-8")
 
     def get_index(self) -> list[dict[str, Any]]:

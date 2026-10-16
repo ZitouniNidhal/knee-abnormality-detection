@@ -16,11 +16,10 @@ not use report text from a competition test set: that would be label leakage.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
 import re
 import unicodedata
+from collections.abc import Iterable
 from typing import Final, Literal, TypedDict
-
 
 LABELS: Final[tuple[str, ...]] = (
     "ACL",
@@ -118,7 +117,7 @@ _STRUCTURAL_NORMAL: Final[str] = (
 
 _NEGATION_PREFIX: Final[re.Pattern[str]] = re.compile(
     r"\b(?:no|without|absent|absence\s+of|negative\s+for|free\s+of|"
-    r"lack(?:ing)?\s+of|lacks|neither)\b(?:\s+[\w/-]+){0,6}\s*$",
+    r"lack(?:ing)?\s+of|lacks|neither)\b(?:[\s,]+(?:and|or|[\w/'’-]+)){0,15}[\s,]*$",
     re.IGNORECASE,
 )
 _HEDGED_NEGATION: Final[re.Pattern[str]] = re.compile(
@@ -171,7 +170,9 @@ def _context(sentence: str, start: int, end: int) -> tuple[str, str]:
     return sentence[max(0, start - 84) : start], sentence[end : end + 64]
 
 
-def _assertion_status(sentence: str, start: int, end: int) -> Literal["positive", "negative", "uncertain"]:
+def _assertion_status(
+    sentence: str, start: int, end: int
+) -> Literal["positive", "negative", "uncertain"]:
     """Classify a matched affirmative phrase using local report context."""
 
     left, right = _context(sentence, start, end)
@@ -193,18 +194,17 @@ def _assertion_status(sentence: str, start: int, end: int) -> Literal["positive"
 def _structural_patterns(alias: str) -> tuple[re.Pattern[str], re.Pattern[str], re.Pattern[str]]:
     """Build bounded anatomy/pathology and anatomy/normal patterns once per use."""
 
-    # Five intervening words covers ordinary dictated wording such as
-    # "ACL demonstrates a full thickness tear" while limiting cross-finding
-    # associations in compound sentences.
-    gap = r"(?:\s+(?:[\w/-]+)){0,5}\s+"
+    # Eight intervening words covers ordinary dictated wording such as
+    # "tear of the posterior horn of the medial meniscus" while limiting
+    # cross-finding associations in compound sentences.
+    gap = r"(?:\s+(?:[\w/-]+)){0,8}\s+"
     positive = re.compile(
         rf"(?:{alias}){gap}{_STRUCTURAL_ABNORMALITY}|"
         rf"{_STRUCTURAL_ABNORMALITY}{gap}(?:{alias})",
         re.IGNORECASE,
     )
     negative = re.compile(
-        rf"(?:{alias}){gap}{_STRUCTURAL_NORMAL}|"
-        rf"{_STRUCTURAL_NORMAL}{gap}(?:{alias})",
+        rf"(?:{alias}){gap}{_STRUCTURAL_NORMAL}|" rf"{_STRUCTURAL_NORMAL}{gap}(?:{alias})",
         re.IGNORECASE,
     )
     mention = re.compile(alias, re.IGNORECASE)
@@ -267,7 +267,9 @@ def _events_for_direct_label(sentence: str, alias: str) -> list[_Event]:
 def _deduplicate(events: list[_Event]) -> list[_Event]:
     seen: set[tuple[str, int, int, str]] = set()
     unique: list[_Event] = []
-    for event in sorted(events, key=lambda item: (item["start"], item["end"], item["status"], item["evidence"])):
+    for event in sorted(
+        events, key=lambda item: (item["start"], item["end"], item["status"], item["evidence"])
+    ):
         key = (event["status"], event["start"], event["end"], event["evidence"])
         if key not in seen:
             seen.add(key)

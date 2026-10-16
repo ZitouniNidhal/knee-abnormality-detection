@@ -7,9 +7,9 @@ of producing a submission with a silently wrong study/series pairing.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable
 from pathlib import Path
-import re
 
 import pandas as pd
 
@@ -43,9 +43,7 @@ def resolve_column(
             f"Could not find one of {list(candidates)!r}. Available columns: "
             f"{list(frame.columns)!r}"
         )
-    raise KeyError(
-        f"Ambiguous aliases {list(candidates)!r}; matched columns {matches!r}."
-    )
+    raise KeyError(f"Ambiguous aliases {list(candidates)!r}; matched columns {matches!r}.")
 
 
 def read_competition_csv(path: str | Path) -> pd.DataFrame:

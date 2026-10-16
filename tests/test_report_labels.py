@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import pytest
-
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
@@ -107,7 +106,9 @@ def test_bare_anatomy_mention_is_not_a_disease_pseudolabel() -> None:
 def test_output_is_deterministic() -> None:
     report = "Mild joint effusion. No ACL tear. Possible bone contusion."
 
-    assert extract_report_labels(report, split="train") == extract_report_labels(report, split="train")
+    assert extract_report_labels(report, split="train") == extract_report_labels(
+        report, split="train"
+    )
 
 
 def test_rejects_non_training_splits() -> None:

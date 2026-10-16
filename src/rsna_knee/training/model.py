@@ -38,7 +38,7 @@ class ModelConfig:
     pretrained: bool = True
 
     @classmethod
-    def from_omegaconf(cls, cfg: DictConfig) -> "ModelConfig":
+    def from_omegaconf(cls, cfg: DictConfig) -> ModelConfig:
         return cls(
             name=cfg.name,
             timm_name=cfg.timm_name,
@@ -74,7 +74,7 @@ class MultilabelHead(nn.Module):
             nn.Linear(hidden_dim, num_classes),
         )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:  # noqa: D102
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
 
 
@@ -163,9 +163,7 @@ class KneeAbnormalityModel(nn.Module):
         with torch.inference_mode():
             return torch.sigmoid(self(x))
 
-    def get_feature_maps(
-        self, x: torch.Tensor
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+    def get_feature_maps(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """Return (feature_maps, logits) for GradCAM; backbone must expose features.
 
         Works for CNN backbones that expose intermediate feature maps via hooks.
@@ -173,7 +171,7 @@ class KneeAbnormalityModel(nn.Module):
         # Forward through backbone internals to get spatial features
         feature_maps: list[torch.Tensor] = []
 
-        def hook_fn(module: nn.Module, inp: Any, out: torch.Tensor) -> None:  # noqa: ANN401
+        def hook_fn(module: nn.Module, inp: Any, out: torch.Tensor) -> None:
             feature_maps.append(out)
 
         # Attach hook to last conv/attention layer
@@ -216,7 +214,7 @@ class KneeAbnormalityModel(nn.Module):
 
     def checkpoint_dict(self) -> dict[str, Any]:
         """Return a versioned checkpoint dictionary."""
-        from ..constants import TARGETS, TARGET_TO_INDEX  # noqa: PLC0415
+        from ..constants import TARGET_TO_INDEX, TARGETS
 
         return {
             "model_state_dict": self.state_dict(),
@@ -235,7 +233,7 @@ class KneeAbnormalityModel(nn.Module):
         }
 
     @classmethod
-    def from_checkpoint(cls, checkpoint: dict[str, Any]) -> "KneeAbnormalityModel":
+    def from_checkpoint(cls, checkpoint: dict[str, Any]) -> KneeAbnormalityModel:
         """Load model from a checkpoint dictionary."""
         config = ModelConfig(**checkpoint["config"], pretrained=False)
         model = cls(config)

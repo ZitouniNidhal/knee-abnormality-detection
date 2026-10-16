@@ -11,7 +11,6 @@ Implements Phase 2 requirements:
 from __future__ import annotations
 
 import hashlib
-import io
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -90,8 +89,8 @@ class DatasetReport:
             f"\n**Generated:** {self.generated_at}",
             f"**Valid:** {'✅ Yes' if self.is_valid else '❌ No'}",
             "\n## Statistics\n",
-            f"| Metric | Value |",
-            f"|--------|-------|",
+            "| Metric | Value |",
+            "|--------|-------|",
             f"| Studies | {self.num_studies:,} |",
             f"| Series | {self.num_series:,} |",
             f"| Targets | {self.num_targets} |",
@@ -229,11 +228,11 @@ class DatasetValidator:
         logger.info("Checking image files for corruption", count=len(all_dcm))
         for dcm_path in all_dcm:
             try:
-                import pydicom  # noqa: PLC0415
+                import pydicom
 
                 ds = pydicom.dcmread(str(dcm_path), stop_before_pixels=False)
                 _ = ds.pixel_array  # Force pixel decode
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.warning("Corrupted DICOM", path=str(dcm_path), error=str(exc))
                 corrupted.append(str(dcm_path))
 
@@ -257,8 +256,8 @@ class DatasetValidator:
         Returns a mapping from hash → list[file_path] for duplicates only.
         """
         try:
-            import imagehash  # noqa: PLC0415
-            from PIL import Image  # noqa: PLC0415
+            import imagehash
+            from PIL import Image
         except ImportError:
             logger.warning("imagehash/Pillow not installed; skipping duplicate detection")
             return {}
@@ -269,7 +268,7 @@ class DatasetValidator:
                 img = Image.open(img_path).convert("L")
                 h = str(imagehash.dhash(img, hash_size=hash_size))
                 hash_map.setdefault(h, []).append(str(img_path))
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.warning("Could not hash image", path=str(img_path), error=str(exc))
 
         duplicates = {h: paths for h, paths in hash_map.items() if len(paths) > 1}
@@ -345,9 +344,9 @@ def build_dataset_manifest(data_dir: Path) -> dict[str, Any]:
 
 def main() -> None:
     """CLI entry-point: rsna-validate-data."""
-    import argparse  # noqa: PLC0415
+    import argparse
 
-    from ..utils.logging import configure_logging  # noqa: PLC0415
+    from ..utils.logging import configure_logging
 
     configure_logging()
     parser = argparse.ArgumentParser(description="Validate RSNA Knee dataset")

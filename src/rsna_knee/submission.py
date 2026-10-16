@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 import numpy as np
 import pandas as pd
@@ -57,9 +57,7 @@ def make_submission(
     predictions = np.asarray(predictions, dtype=np.float64)
     expected_shape = (len(test_frame), N_TARGETS)
     if predictions.shape != expected_shape:
-        raise ValueError(
-            f"Prediction shape must be {expected_shape!r}, got {predictions.shape!r}."
-        )
+        raise ValueError(f"Prediction shape must be {expected_shape!r}, got {predictions.shape!r}.")
     if not np.isfinite(predictions).all():
         raise ValueError("Predictions contain NaN or infinity.")
     if apply_rank_normalization:

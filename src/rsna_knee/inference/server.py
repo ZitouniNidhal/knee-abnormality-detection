@@ -15,20 +15,19 @@ from __future__ import annotations
 import io
 import os
 import time
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, AsyncGenerator
+from typing import Any
 
 import numpy as np
 import torch
 import torch.nn as nn
 from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from PIL import Image
-from prometheus_client import Counter, Gauge, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 from pydantic import BaseModel, Field
-from starlette.requests import Request
 from starlette.responses import Response
 
 from ..constants import TARGETS
@@ -82,16 +81,18 @@ class ModelRegistry:
 _registry = ModelRegistry()
 
 
-def _get_transforms(image_size: int = 224) -> Any:  # noqa: ANN401
+def _get_transforms(image_size: int = 224) -> Any:
     """Build inference-time image transforms."""
     try:
-        import torchvision.transforms as T  # noqa: PLC0415
+        import torchvision.transforms as T
 
-        return T.Compose([
-            T.Resize((image_size, image_size)),
-            T.ToTensor(),
-            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
+        return T.Compose(
+            [
+                T.Resize((image_size, image_size)),
+                T.ToTensor(),
+                T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ]
+        )
     except ImportError:
         logger.warning("torchvision not installed; using basic PIL resize")
         return None
@@ -133,7 +134,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     if model_path and Path(model_path).exists():
         try:
-            from ..training.model import KneeAbnormalityModel  # noqa: PLC0415
+            from ..training.model import KneeAbnormalityModel
 
             checkpoint = torch.load(model_path, map_location=_registry.device, weights_only=False)
             _registry.model = KneeAbnormalityModel.from_checkpoint(checkpoint)
@@ -150,7 +151,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
                 device=device_name,
                 model_name=_registry.model_name,
             )
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.error("Failed to load model", error=str(exc))
             MODEL_LOADED.set(0)
     else:
@@ -299,11 +300,13 @@ async def predict(
         for idx, target in enumerate(TARGETS):
             prob = float(probs[0, idx])
             PREDICTION_CONFIDENCE.labels(target=target).observe(prob)
-            predictions.append(PredictionScore(
-                target=target,
-                probability=prob,
-                positive=prob >= threshold,
-            ))
+            predictions.append(
+                PredictionScore(
+                    target=target,
+                    probability=prob,
+                    positive=prob >= threshold,
+                )
+            )
 
         return PredictionResponse(
             study_id=study_id,
@@ -369,18 +372,22 @@ async def predict_batch(
             preds = []
             for idx, target in enumerate(TARGETS):
                 prob = float(probs[b_idx, idx])
-                preds.append(PredictionScore(
-                    target=target,
-                    probability=prob,
-                    positive=prob >= threshold,
-                ))
-            results.append(PredictionResponse(
-                study_id=f.filename or f"sample_{b_idx}",
-                predictions=preds,
-                inference_time_ms=elapsed_ms / len(files),
-                model_name=_registry.model_name,
-                threshold=threshold,
-            ))
+                preds.append(
+                    PredictionScore(
+                        target=target,
+                        probability=prob,
+                        positive=prob >= threshold,
+                    )
+                )
+            results.append(
+                PredictionResponse(
+                    study_id=f.filename or f"sample_{b_idx}",
+                    predictions=preds,
+                    inference_time_ms=elapsed_ms / len(files),
+                    model_name=_registry.model_name,
+                    threshold=threshold,
+                )
+            )
         return results
 
     except HTTPException:
@@ -405,7 +412,7 @@ async def metrics() -> Response:
 
 def main() -> None:
     """CLI entry-point: rsna-serve."""
-    import uvicorn  # noqa: PLC0415
+    import uvicorn
 
     uvicorn.run(
         "rsna_knee.inference.server:app",

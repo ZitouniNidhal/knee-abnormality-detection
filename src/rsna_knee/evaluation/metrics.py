@@ -213,8 +213,8 @@ def plot_confusion_matrices(
 ) -> Path:
     """Generate per-target confusion matrix grid and save as PNG."""
     try:
-        import matplotlib.pyplot as plt  # noqa: PLC0415
-        import seaborn as sns  # noqa: PLC0415
+        import matplotlib.pyplot as plt
+        import seaborn as sns
     except ImportError:
         logger.warning("matplotlib/seaborn not installed; skipping confusion matrix plot")
         return Path(output_dir)
@@ -244,7 +244,7 @@ def plot_confusion_matrices(
         ax.set_xlabel("Predicted")
         ax.set_ylabel("Actual")
 
-    for ax in axes[len(TARGETS):]:
+    for ax in axes[len(TARGETS) :]:
         ax.set_visible(False)
 
     fig.suptitle(f"Confusion Matrices — {model_name}", fontsize=14, fontweight="bold", y=1.02)
@@ -265,7 +265,7 @@ def plot_roc_curves(
 ) -> Path:
     """Generate overlaid ROC curves for all targets."""
     try:
-        import matplotlib.pyplot as plt  # noqa: PLC0415
+        import matplotlib.pyplot as plt
     except ImportError:
         logger.warning("matplotlib not installed; skipping ROC plot")
         return Path(output_dir)
@@ -306,7 +306,7 @@ def plot_pr_curves(
 ) -> Path:
     """Generate Precision-Recall curves for all targets."""
     try:
-        import matplotlib.pyplot as plt  # noqa: PLC0415
+        import matplotlib.pyplot as plt
     except ImportError:
         logger.warning("matplotlib not installed; skipping PR plot")
         return Path(output_dir)
@@ -373,11 +373,13 @@ def generate_clinical_report(
         mcc = f"{t.mcc:.4f}" if not np.isnan(t.mcc) else "N/A"
         lines.append(f"| {t.target} | {auc} | {f1} | {rec} | {prec} | {spec} | {mcc} |")
 
-    lines.extend([
-        "\n---",
-        "\n> **Note:** Metrics computed at threshold=0.5. AUC is threshold-independent.",
-        "\n> This report is for research purposes only and does not constitute clinical advice.",
-    ])
+    lines.extend(
+        [
+            "\n---",
+            "\n> **Note:** Metrics computed at threshold=0.5. AUC is threshold-independent.",
+            "\n> This report is for research purposes only and does not constitute clinical advice.",
+        ]
+    )
 
     output_path.write_text("\n".join(lines), encoding="utf-8")
     logger.info("Clinical report saved", path=str(output_path))

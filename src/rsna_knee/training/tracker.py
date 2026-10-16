@@ -17,7 +17,6 @@ Usage
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -51,7 +50,7 @@ class ExperimentTracker:
 
         # MLflow
         try:
-            import mlflow  # noqa: PLC0415
+            import mlflow
 
             mlflow.set_tracking_uri(mlflow_uri)
             mlflow.set_experiment(experiment_name)
@@ -78,7 +77,7 @@ class ExperimentTracker:
 
         if self._use_wandb:
             try:
-                import wandb  # noqa: PLC0415
+                import wandb
 
                 wandb.init(
                     project=self._wandb_project,
@@ -95,7 +94,7 @@ class ExperimentTracker:
 
         if self._use_tb:
             try:
-                from torch.utils.tensorboard import SummaryWriter  # noqa: PLC0415
+                from torch.utils.tensorboard import SummaryWriter
 
                 log_dir = Path(self._tb_log_dir) / run_name
                 self._tb_writer = SummaryWriter(log_dir=str(log_dir))
@@ -135,10 +134,10 @@ class ExperimentTracker:
         if self._use_wandb and hasattr(self, "_wandb"):
             self._wandb.save(str(path))
 
-    def log_figure(self, figure: Any, name: str, *, step: int | None = None) -> None:  # noqa: ANN401
+    def log_figure(self, figure: Any, name: str, *, step: int | None = None) -> None:
         """Log a matplotlib figure."""
         if self._mlflow is not None:
-            import tempfile  # noqa: PLC0415
+            import tempfile
 
             with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
                 figure.savefig(tmp.name, dpi=120, bbox_inches="tight")
@@ -168,7 +167,7 @@ class ExperimentTracker:
             model_uri = f"runs:/{run_id}/model"
             self._mlflow.register_model(model_uri=model_uri, name=model_name, tags=tags)
             logger.info("Model registered", name=model_name, run_id=run_id)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             logger.error("Model registration failed", error=str(exc))
 
     def end_run(self) -> None:
@@ -180,8 +179,8 @@ class ExperimentTracker:
         if self._tb_writer is not None:
             self._tb_writer.close()
 
-    def __enter__(self) -> "ExperimentTracker":
+    def __enter__(self) -> ExperimentTracker:
         return self
 
-    def __exit__(self, *args: Any) -> None:  # noqa: ANN401
+    def __exit__(self, *args: Any) -> None:
         self.end_run()
