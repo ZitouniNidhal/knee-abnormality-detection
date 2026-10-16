@@ -1,6 +1,12 @@
 # RSNA Knee Abnormality Detection
 
-Production-ready Multimodal Deep Learning pipeline for detecting 12 clinically significant knee abnormalities from MRI scans (DICOM series) and radiology reports.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python: 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Framework: PyTorch](https://img.shields.io/badge/PyTorch-2.1%2B-ee4c2c.svg)](https://pytorch.org/)
+[![API: FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688.svg)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+
+Production-grade Medical AI & MLOps pipeline for detecting 12 clinically significant knee abnormalities from MRI scans (DICOM series) and radiology reports using Vision Transformers and deep learning.
 
 ---
 
@@ -34,11 +40,7 @@ unzip rsna-knee-abnormality-detection.zip -d data/raw/
 ### Alternative Benchmark:
 - [Stanford MRNet Dataset](https://stanfordmlgroup.github.io/competitions/mrnet/)
 
-<<<<<<< HEAD
 For detailed directory structures, see [`data/README.md`](data/README.md).
-=======
-For detailed directory structures, see [`data/README.md`](file:///data/README.md).
->>>>>>> 772a78a47a6ff68c9e3bc2dd16dfc7ddd4728a88
 
 ---
 
@@ -63,3 +65,17 @@ uvicorn rsna_knee.inference.server:app --host 0.0.0.0 --port 8000
 - `GET /health` — Health check & model status
 - `POST /predict` — Multilabel classification for knee MRI slices
 - `GET /metrics` — Prometheus telemetry
+
+---
+
+## 👥 Contributors
+
+- **Nidhal Zitouni** ([@ZitouniNidhal](https://github.com/ZitouniNidhal)) — *Creator & Lead Maintainer*
+
+See [`CONTRIBUTORS.md`](CONTRIBUTORS.md) for contribution guidelines.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [`LICENSE`](LICENSE) file for details.
